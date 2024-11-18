@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import InternshipCard from './InternshipCard';
 import Filters from './Filters';
 
@@ -135,11 +135,21 @@ const InternshipsPage = () => {
     duration: "",
   });
 
+  useEffect(() => {
+    let url = new URL(window.location.href);
+    let c = Object.fromEntries(url.searchParams.entries()); // Read filters from URL after redirect from homepage
+    setFilters({ ...filters, ...c });
+  }, []);
+
   // Filter function
   const filteredInternships = internships.filter((internship) => {
+    let dur = parseInt(internship.duration.split(" ")[0]); // Duration from each internship
+    let filteredDur = parseInt(filters.duration.split(" ")[0]); // Duration from filter
+
     return (
       (filters.location === "" || internship.location.includes(filters.location)) &&
-      (filters.type === "" || internship.type === filters.type)
+      (filters.type === "" || internship.type === filters.type) &&
+      (isNaN(filteredDur) || filteredDur === dur || (filteredDur === 3 && filteredDur <= dur))
     );
   });
 
